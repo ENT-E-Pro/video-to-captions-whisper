@@ -1,0 +1,154 @@
+{
+  "title": "Video to Captions input",
+  "type": "object",
+  "schemaVersion": 1,
+  "description": "Transcribe one or more public audio/video URLs with Whisper (faster-whisper, CPU). Pass `url` for one file or `files` for a batch. Each result row has download URLs for .srt, .vtt, .txt and .json plus the detected language and full text.",
+  "properties": {
+    "url": {
+      "title": "Audio or video URL",
+      "type": "string",
+      "editor": "textfield",
+      "description": "Direct, publicly downloadable URL of ONE audio or video file (http/https; redirects followed). Any FFmpeg-readable format: mp4, mov, mkv, webm, mp3, wav, m4a, ogg, flac, opus... Max 2 GB. Must be the media file itself, not a YouTube/TikTok/web page. Example: https://archive.org/download/short_stories14_librivox/maxims_wilde_tb_64kb.mp3",
+      "prefill": "https://archive.org/download/short_stories14_librivox/maxims_wilde_tb_64kb.mp3"
+    },
+    "files": {
+      "title": "Batch of files",
+      "type": "array",
+      "editor": "json",
+      "description": "Optional batch, processed sequentially. Array of objects {\"url\": string (required), plus any of model, language, task, startSeconds, durationSeconds, maxCharsPerLine, maxLinesPerCue, maxCueSeconds, wordsPerCue, vadFilter, beamSize, initialPrompt, txtTimestamps to override the top-level value for that file}. Plain URL strings are also accepted. Example: [{\"url\":\"https://example.com/talk.mp4\"},{\"url\":\"https://example.com/entrevista.mp3\",\"language\":\"es\",\"task\":\"translate\"}]. Failed items return status=error and are not charged."
+    },
+    "model": {
+      "title": "Whisper model",
+      "type": "string",
+      "editor": "select",
+      "default": "small",
+      "enum": [
+        "tiny",
+        "base",
+        "small",
+        "large-v3-turbo",
+        "tiny.en",
+        "base.en",
+        "small.en"
+      ],
+      "enumTitles": [
+        "tiny (fastest, rough)",
+        "base (fast)",
+        "small (default: good balance)",
+        "large-v3-turbo (high quality: accents, noise, non-English; HQ rate)",
+        "tiny.en (English only)",
+        "base.en (English only)",
+        "small.en (English only)"
+      ],
+      "description": "Open-source Whisper model run with faster-whisper (CTranslate2, int8, CPU). Default: small - good accuracy for clear speech in most languages. Use base/tiny for speed or rough drafts. Use large-v3-turbo for accented, noisy, technical or non-English speech; it is billed at the higher 'audio-minute-hq' rate, runs about 2-3x slower than small and is downloaded at run start (adds ~30-60 s). *.en models are English-only. tiny, base and small are preloaded."
+    },
+    "language": {
+      "title": "Language",
+      "type": "string",
+      "editor": "textfield",
+      "default": "auto",
+      "description": "Spoken language as an ISO 639-1 code (e.g. en, es, de, fr, pt, ja, zh, hi), or 'auto' (default) to auto-detect from the first 30 seconds. Setting it explicitly is faster and avoids misdetection on short or music-heavy clips. The detected language is returned in the output."
+    },
+    "task": {
+      "title": "Task",
+      "type": "string",
+      "editor": "select",
+      "default": "transcribe",
+      "enum": [
+        "transcribe",
+        "translate"
+      ],
+      "enumTitles": [
+        "Transcribe (same language)",
+        "Translate to English"
+      ],
+      "description": "transcribe = captions in the spoken language (default). translate = English captions for non-English speech (Whisper's built-in speech translation; works with tiny, base, small, medium and large-v3; English-only models and large-v3-turbo are not trained for it)."
+    },
+    "startSeconds": {
+      "title": "Start at (s)",
+      "type": "number",
+      "editor": "number",
+      "minimum": 0,
+      "description": "Optional: start transcribing at this many seconds into the file (e.g. 120). Caption timestamps stay relative to the ORIGINAL file, so they line up with the untrimmed video. Default: 0."
+    },
+    "durationSeconds": {
+      "title": "Duration (s)",
+      "type": "number",
+      "editor": "number",
+      "minimum": 1,
+      "description": "Optional: only transcribe this many seconds from startSeconds (e.g. 60). Billing is per started minute of transcribed audio, so trimming lowers cost. Default: to the end of the file."
+    },
+    "maxCharsPerLine": {
+      "title": "Max characters per line",
+      "type": "integer",
+      "editor": "number",
+      "default": 42,
+      "minimum": 10,
+      "maximum": 120,
+      "description": "Caption line length for SRT/VTT. Default 42 (Netflix/BBC guideline). Use 32 for mobile/vertical video, 20-25 for big short-form captions."
+    },
+    "maxLinesPerCue": {
+      "title": "Max lines per caption",
+      "type": "integer",
+      "editor": "number",
+      "default": 2,
+      "minimum": 1,
+      "maximum": 4,
+      "description": "Maximum lines shown at once in each SRT/VTT caption. Default 2 (broadcast standard); 1 for short-form/social video."
+    },
+    "maxCueSeconds": {
+      "title": "Max caption duration (s)",
+      "type": "number",
+      "editor": "number",
+      "default": 6,
+      "minimum": 1,
+      "maximum": 30,
+      "description": "Maximum time a single caption stays on screen, in seconds. Default 6. Captions are split on word timestamps and sentence ends."
+    },
+    "wordsPerCue": {
+      "title": "Words per caption (short-form style)",
+      "type": "integer",
+      "editor": "number",
+      "minimum": 1,
+      "maximum": 20,
+      "description": "Optional: fixed maximum number of words per caption (e.g. 1-4 for TikTok/Reels/Shorts style pop-on captions). Leave empty for standard subtitles filled up to maxCharsPerLine x maxLinesPerCue."
+    },
+    "vadFilter": {
+      "title": "Skip silence (VAD)",
+      "type": "boolean",
+      "editor": "checkbox",
+      "default": true,
+      "description": "Use Silero voice-activity detection to skip non-speech parts. Default true: faster and prevents Whisper from hallucinating text during silence/music. Disable only if quiet speech is being dropped."
+    },
+    "beamSize": {
+      "title": "Beam size",
+      "type": "integer",
+      "editor": "number",
+      "default": 5,
+      "minimum": 1,
+      "maximum": 10,
+      "description": "Decoding beam width. Default 5 (most accurate). 1 = greedy decoding, roughly 1.5-2x faster with slightly lower accuracy."
+    },
+    "initialPrompt": {
+      "title": "Vocabulary hint (initial prompt)",
+      "type": "string",
+      "editor": "textarea",
+      "description": "Optional text that primes Whisper with spelling of names, brands and jargon, e.g. 'Guests: Siobhan O'Neill, Kubernetes, PyTorch, ENT-E.' Keep it short (under ~200 words). Also nudges punctuation/casing style."
+    },
+    "txtTimestamps": {
+      "title": "Timestamps in TXT",
+      "type": "boolean",
+      "editor": "checkbox",
+      "default": false,
+      "description": "If true, the .txt transcript has one segment per line prefixed with [HH:MM:SS]. Default false: clean paragraphs (new paragraph after pauses > 2 s), ideal for LLM summarization."
+    },
+    "maxDurationSeconds": {
+      "title": "Max audio duration (s)",
+      "type": "integer",
+      "editor": "number",
+      "default": 10800,
+      "minimum": 1,
+      "description": "Safety cap on the duration to transcribe, in seconds (default 10800 = 3 hours). Longer inputs are rejected with status=error and not charged unless trimmed with durationSeconds. Set the run timeout accordingly for long files (see README for speed per model)."
+    }
+  }
+}

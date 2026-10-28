@@ -1,0 +1,18 @@
+{
+  "actorOutputSchemaVersion": 1,
+  "title": "Captions and transcripts",
+  "properties": {
+    "results": {
+      "type": "string",
+      "title": "Results",
+      "description": "One dataset row per input URL: status, detected language, full transcript text, and download URLs for .srt, .vtt, .txt and .json (segments with word timestamps), or an error message.",
+      "template": "{{links.apiDefaultDatasetUrl}}/items?view=overview"
+    },
+    "files": {
+      "type": "string",
+      "title": "Caption files",
+      "description": "Key-value store holding the generated SRT, VTT, TXT and JSON files.",
+      "template": "{{links.apiDefaultKeyValueStoreUrl}}/keys"
+    }
+  }
+}

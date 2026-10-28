@@ -1,0 +1,25 @@
+{
+  "events": {
+    "apify-actor-start": {
+      "title": "Actor start",
+      "price": 5e-05
+    },
+    "transcript-created": {
+      "title": "Transcript created",
+      "description": "One successfully transcribed file with SRT, VTT, TXT and JSON outputs (primary event). Failed files are free.",
+      "price": 0.005,
+      "isPrimary": true
+    },
+    "audio-minute": {
+      "title": "Audio minute transcribed",
+      "description": "Per started minute of transcribed audio with tiny, base or small (and .en variants). Up to 0.5 s of padding is ignored when rounding.",
+      "price": 0.02
+    },
+    "audio-minute-hq": {
+      "title": "Audio minute transcribed (HQ model)",
+      "description": "Per started minute of transcribed audio with large-v3-turbo. Charged instead of audio-minute, never in addition. Up to 0.5 s of padding is ignored when rounding.",
+      "price": 0.06
+    }
+  },
+  "passPlatformUsageToUser": false
+}

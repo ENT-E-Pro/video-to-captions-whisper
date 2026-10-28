@@ -1,0 +1,25 @@
+{
+  "actorSpecification": 1,
+  "views": {
+    "overview": {
+      "title": "Results",
+      "transformation": {
+        "fields": ["sourceUrl", "status", "language", "model", "durationSeconds", "cueCount", "wordCount", "srtUrl", "vttUrl", "txtUrl", "jsonUrl", "billedMinutes", "error"]
+      },
+      "display": {
+        "component": "table",
+        "properties": {
+          "srtUrl": {"label": "SRT", "format": "link"},
+          "vttUrl": {"label": "VTT", "format": "link"},
+          "txtUrl": {"label": "TXT", "format": "link"},
+          "jsonUrl": {"label": "JSON", "format": "link"}
+        }
+      }
+    },
+    "text": {
+      "title": "Transcripts",
+      "transformation": {"fields": ["sourceUrl", "language", "text"]},
+      "display": {"component": "table"}
+    }
+  }
+}

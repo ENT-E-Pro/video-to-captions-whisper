@@ -1,0 +1,17 @@
+{
+  "actorSpecification": 1,
+  "name": "video-to-captions-whisper",
+  "title": "Video to Captions (SRT, VTT, TXT) - Whisper AI",
+  "description": "Transcribe any public audio or video URL to SRT and WebVTT subtitles, plain-text transcript and JSON segments with word timestamps, using open-source Whisper (faster-whisper) with automatic language detection and optional translation to English.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "input": "./input_schema.json",
+  "dockerfile": "../Dockerfile",
+  "storages": {
+    "dataset": "./dataset_schema.json"
+  },
+  "output": "./output_schema.json",
+  "defaultRunOptions": {
+    "memoryMbytes": 4096
+  }
+}
